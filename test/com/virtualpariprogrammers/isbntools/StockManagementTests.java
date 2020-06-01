@@ -4,6 +4,9 @@ import com.virtualpairprogrammers.isbntools.Book;
 import com.virtualpairprogrammers.isbntools.ExternalISBNDataService;
 import com.virtualpairprogrammers.isbntools.StockManager;
 import org.junit.Test;
+
+
+
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
@@ -12,19 +15,11 @@ public class StockManagementTests {
     @Test
     public void testCanGetACorrectLocatorCode() {
 
-        ExternalISBNDataService testWebService = new ExternalISBNDataService() {
-            @Override
-            public Book lookup(String isbn) {
-                return new Book(isbn, "Of Mice And Men", "J. Steinbeck");
-            }
-        };
+        ExternalISBNDataService testWebService = mock(ExternalISBNDataService.class);
+        when(testWebService.lookup(anyString())).thenReturn(new Book("0130177396", "of Mice and Man", "J. Stelnbeck"));
 
-        ExternalISBNDataService testDatabaseService = new ExternalISBNDataService() {
-            @Override
-            public Book lookup(String isbn) {
-                return null;
-            }
-        };
+        ExternalISBNDataService testDatabaseService = mock(ExternalISBNDataService.class);
+        when(testDatabaseService.lookup(anyString())).thenReturn(null);
 
         StockManager stockManager = new StockManager();
         stockManager.setWebService(testWebService);
@@ -51,7 +46,6 @@ public class StockManagementTests {
         verify(databaseService).lookup("0130177396");
         verify(webService,never()).lookup(anyString());
     }
-
     @Test
     public void webserviceIsUsedIfDataIsNotPresent() {
         ExternalISBNDataService databaseService = mock(ExternalISBNDataService.class);
